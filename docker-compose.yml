@@ -1,0 +1,22 @@
+services:
+  backend:
+    build: ./backend
+    ports: ["${API_PORT:-8053}:8000"]
+    environment:
+      OTP_DEV: "1" # no SMS gateway yet: OTP is shown in the UI. Set 0 in production.
+    volumes: [data:/data]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 10s
+      retries: 5
+  frontend:
+    build:
+      context: ./frontend
+      args: { API_URL: http://backend:8000 }
+    environment: { API_URL: http://backend:8000 }
+    ports: ["${WEB_PORT:-3053}:3000"]
+    depends_on:
+      backend: { condition: service_healthy }
+
+volumes:
+  data:

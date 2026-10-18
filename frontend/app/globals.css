@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f5f5f7, #000);
+  --fg: light-dark(#1d1d1f, #f5f5f7);
+  --muted: light-dark(#6e6e73, #98989d);
+  --card: light-dark(#fff, #151516);
+  --line: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.1));
+  --glass: light-dark(rgb(255 255 255 / 0.66), rgb(28 28 30 / 0.62));
+  --accent: light-dark(#0a9a93, #2ee6d6);
+  --a1: #14d8c6; --a2: #6d5dfc; --a3: #ff4f8b; --a4: #ffb547;
+}
+[data-theme="light"] { color-scheme: light; }
+[data-theme="dark"] { color-scheme: dark; }
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-card: var(--card);
+  --color-line: var(--line);
+  --color-glass: var(--glass);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-vazir), system-ui, sans-serif;
+}
+
+html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+body { background: var(--bg); color: var(--fg); -webkit-font-smoothing: antialiased; }
+::selection { background: color-mix(in oklab, var(--a1) 35%, transparent); }
+
+.glass { background: var(--glass); backdrop-filter: saturate(180%) blur(24px); } /* build adds -webkit- for Safari */
+.grad { background: linear-gradient(100deg, var(--a1), var(--a2) 45%, var(--a3) 80%, var(--a4)); background-size: 200% auto;
+  -webkit-background-clip: text; background-clip: text; color: transparent; animation: shimmer 8s ease-in-out infinite alternate; }
+.btn { background: linear-gradient(135deg, var(--a1), var(--a2) 60%, var(--a3)); color: #fff; box-shadow: 0 10px 30px -10px color-mix(in oklab, var(--a2) 70%, transparent);
+  transition: transform .2s cubic-bezier(.3,.7,.4,1.5), box-shadow .2s; }
+.btn:hover { transform: translateY(-1px) scale(1.02); box-shadow: 0 16px 40px -12px color-mix(in oklab, var(--a2) 80%, transparent); }
+.btn:active { transform: scale(.97); }
+.no-bar { scrollbar-width: none; } .no-bar::-webkit-scrollbar { display: none; }
+
+/* aurora */
+.blob { position: absolute; border-radius: 9999px; filter: blur(80px); opacity: .5; animation: drift 18s ease-in-out infinite alternate; }
+.noise { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E"); opacity: .06; mix-blend-mode: overlay; }
+.float { animation: float 7s ease-in-out infinite; }
+
+@keyframes drift { to { transform: translate3d(8%, 12%, 0) scale(1.15) rotate(25deg); } }
+@keyframes float { 50% { translate: 0 -14px; } }
+@keyframes shimmer { to { background-position: 100% center; } }
+@keyframes rise { from { opacity: 0; transform: translateY(40px) scale(.97); } }
+@keyframes pop { from { opacity: 0; transform: scale(.9) translateY(12px); } }
+@keyframes beat { 30% { transform: scale(1.35); } 60% { transform: scale(.9); } }
+
+.pop { animation: pop .5s cubic-bezier(.2,.8,.2,1.2) both; }
+.beat { animation: beat .45s ease; }
+@supports (animation-timeline: view()) {
+  .reveal { animation: rise linear both; animation-timeline: view(); animation-range: entry 0% cover 25%; }
+}
+
+dialog::backdrop { background: rgb(0 0 0 / .45); backdrop-filter: blur(8px); }
+dialog[open] { animation: pop .45s cubic-bezier(.2,.8,.2,1.2); }
+
+/* theme switch: circular reveal (View Transitions API) */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-new(root) { animation: reveal .6s cubic-bezier(.6,0,.2,1); }
+@keyframes reveal { from { clip-path: circle(0 at var(--x, 50%) var(--y, 0)); } to { clip-path: circle(150vmax at var(--x, 50%) var(--y, 0)); } }
+
+input[type="range"] { accent-color: var(--a2); }
+input[type="date"]::-webkit-calendar-picker-indicator { filter: light-dark(none, invert(1)); opacity: .6; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+.i-sun { display: none; }
+[data-theme="dark"] .i-sun { display: block; } [data-theme="dark"] .i-moon { display: none; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme]) .i-sun { display: block; } :root:not([data-theme]) .i-moon { display: none; } }
